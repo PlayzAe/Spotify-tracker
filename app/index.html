@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Longplay — your whole listening history, from one file</title>
+<meta name="description" content="Turn your Spotify data export into your complete listening history. No login, no upload, nothing leaves your browser. Free, by Emberfig.">
+<!-- The browser paints its own chrome with this, so it has to be the page
+     background, not the accent. JS keeps it in step with the toggle. -->
+<meta name="theme-color" content="#F1F0EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1310" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/src/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23156152'/%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%23F1F0EA' stroke-width='1.6' opacity='.55'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%23F1F0EA' stroke-width='1.3' opacity='.4'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23F1F0EA'/%3E%3C/svg%3E">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="lp-mark" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="15" fill="currentColor"/>
+    <circle cx="16" cy="16" r="9.5" fill="none" stroke="var(--paper)" stroke-width="1.6" opacity=".5"/>
+    <circle cx="16" cy="16" r="5" fill="none" stroke="var(--paper)" stroke-width="1.3" opacity=".38"/>
+    <circle cx="16" cy="16" r="2" fill="var(--paper)"/>
+  </symbol>
+</defs></svg>
+
+<!-- level-meter scroll rail: segments light as you descend -->
+<div class="rail" id="rail" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#/">
+      <svg class="brand-mark"><use href="#lp-mark"/></svg>
+      <span class="brand-name">Longplay</span>
+      <span class="brand-by">by Emberfig</span>
+    </a>
+    <span class="spacer"></span>
+    <nav class="navlinks" id="nav">
+      <a href="#/">Home</a>
+      <a href="#/why">Why</a>
+      <a href="#/get">Get your file</a>
+      <a href="#/upload">Upload</a>
+    </nav>
+    <button class="icon-btn" id="theme" aria-label="Switch between light and dark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- ═══════════ PAGE: home ═══════════ -->
+<div class="page" data-page="/">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1 class="big rise">
+          Not one year.<br><span class="thin">The</span> <span class="pine">whole record</span>.
+        </h1>
+        <p class="lede rise" style="--d:140ms">
+          Spotify keeps every song you have ever played, and it will hand the file to you.
+          Longplay turns it into the stats they never show — going back to the day you joined.
+        </p>
+        <div class="cta-row rise" style="--d:200ms">
+          <a class="btn btn-primary" href="#/get">Get your file
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#/upload">I already have it</a>
+        </div>
+        <p class="terms rise" style="--d:260ms">
+          <b>Free forever</b><i></i>No account<i></i>Nothing leaves your browser<i></i>Alpha 1.0
+        </p>
+      </div>
+      <div class="stack" aria-hidden="true">
+        <span class="disc" style="--r:-19deg;--x:-124px;--d:210ms"></span>
+        <span class="disc" style="--r:-8deg;--x:-62px;--d:140ms"></span>
+        <span class="disc" style="--r:6deg;--x:0px;--d:70ms"></span>
+        <span class="disc" style="--r:19deg;--x:62px;--d:0ms"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2 class="reveal" style="--d:60ms">Everything, sliced however you want it.</h2>
+      <dl class="claims">
+        <div class="claim reveal" style="--d:100ms">
+          <dt>Real numbers</dt>
+          <dd>True play durations, not estimates. Every song, artist and album you have ever touched.</dd>
+        </div>
+        <div class="claim reveal" style="--d:150ms">
+          <dt>Any moment in time</dt>
+          <dd>One year, one summer, one week — or the day you joined until today. Recomputes instantly.</dd>
+        </div>
+        <div class="claim reveal" style="--d:200ms">
+          <dt>Habits, not totals</dt>
+          <dd>Phone versus desktop. What you skip. What you only ever hear because shuffle chose it.</dd>
+        </div>
+      </dl>
+      <p class="reveal" style="margin-top:26px;--d:250ms">
+        <a href="#/why" class="btn btn-ghost">Why we built it →</a>
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: why ═══════════ -->
+<div class="page" data-page="/why">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="reveal" style="--d:60ms">We rebuild apps people like but keep complaining about.</h2>
+      <p class="reveal" style="--d:110ms">
+        Emberfig is a two-person studio. We find an app people rely on and find frustrating,
+        read every complaint we can, then build the version that fixes them. Free, ad-supported.
+        You never pay us and we never sell your data.
+      </p>
+      <blockquote class="quote reveal" style="--d:160ms">
+        <p>“One person’s annoyance is an opinion. Forty is a defect.”</p>
+        <cite>emberfig.com</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="band tint">
+    <div class="wrap">
+      <h2 class="reveal" style="--d:60ms">Four complaints. Four fixes.</h2>
+      <p class="reveal" style="--d:100ms">Every one of these came up repeatedly in reviews of the apps that already do this.</p>
+      <div class="fixes">
+        <div class="fix reveal" style="--d:120ms">
+          <div class="said"><span class="n">Complaint</span>“It counts skipped tracks as fully listened to.”</div>
+          <div class="did"><span class="n">Fix</span>Your file records <b>how long each song actually played</b> and why it stopped. We read both.</div>
+        </div>
+        <div class="fix reveal" style="--d:170ms">
+          <div class="said"><span class="n">Complaint</span>“Days of data constantly missing.”</div>
+          <div class="did"><span class="n">Fix</span>Nothing to miss. The file <b>is</b> the complete record, straight from Spotify.</div>
+        </div>
+        <div class="fix reveal" style="--d:220ms">
+          <div class="said"><span class="n">Complaint</span>“A two-week phase shoves an artist into your top five.”</div>
+          <div class="did"><span class="n">Fix</span>Sort by <b>consistency</b> and a short obsession stops outranking a years-long habit.</div>
+        </div>
+        <div class="fix reveal" style="--d:270ms">
+          <div class="said"><span class="n">Complaint</span>“It wants too much access to my Spotify account.”</div>
+          <div class="did"><span class="n">Fix</span>We ask for <b>none</b>. There is no login button anywhere on this site.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band dark">
+    <div class="wrap">
+      <h2 class="reveal" style="--d:60ms;max-width:22ch">No account means no live data. We think that is the right way round.</h2>
+      <p class="reveal" style="--d:110ms;max-width:56ch">
+        Spotify’s API caps an app at five users total. Using it would mean logins, a server,
+        and a waiting list. Reading your file instead means unlimited people, no account,
+        and a history that goes back further than any API can reach.
+      </p>
+      <p class="reveal" style="margin-top:24px;--d:160ms">
+        <a href="#/get" class="btn btn-primary">Get your file →</a>
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: get ═══════════ -->
+<div class="page" data-page="/get">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="reveal">Step one: ask Spotify for your data.</h2>
+      <p class="reveal" style="--d:100ms">
+        You do this once. Spotify emails a link — usually within a few hours, sometimes a few
+        days. There are two downloads on that page and <b>only one is right</b>.
+      </p>
+
+      <div class="reveal" style="--d:150ms">
+        <div class="tabs" role="tablist" aria-label="Choose your device">
+          <button role="tab" aria-selected="true" data-tab="desktop">On a computer</button>
+          <button role="tab" aria-selected="false" data-tab="mobile">On a phone</button>
+        </div>
+
+        <div data-panel="desktop">
+          <ol class="steps">
+            <li><b>Go to</b> <code>spotify.com/account/privacy</code> and log in.</li>
+            <li><b>Scroll to</b> “Download your data”.</li>
+            <li><b>Tick the right box.</b> This is the part everyone gets wrong.
+              <div class="illus" aria-hidden="true">
+                <svg viewBox="0 0 520 190" width="100%">
+                  <rect x="8" y="8" width="504" height="174" rx="12" class="il-card"/>
+                  <text x="26" y="36" class="il-title">Download your data</text>
+                  <rect x="26" y="52" width="316" height="44" rx="9" class="il-row"/>
+                  <rect x="40" y="67" width="14" height="14" rx="4" class="il-box"/>
+                  <text x="66" y="72" class="il-lbl">Account data</text>
+                  <text x="66" y="88" class="il-sub">About a year — no listening times</text>
+                  <text x="352" y="80" class="il-no">✕ not this one</text>
+                  <rect x="26" y="106" width="316" height="46" rx="9" class="il-row il-row-on"/>
+                  <rect x="40" y="122" width="14" height="14" rx="4" class="il-box il-box-on"/>
+                  <path d="M43.5 129 l3 3 l5.5 -6" class="il-tick"/>
+                  <text x="66" y="127" class="il-lbl-on">Extended streaming history</text>
+                  <text x="66" y="143" class="il-sub">Everything, since day one</text>
+                  <path d="M470 130 C 420 130, 400 130, 356 130" class="il-arrow"/>
+                  <path d="M362 124 l-8 6 l8 6" class="il-arrow-head"/>
+                  <text x="480" y="122" class="il-yes" text-anchor="end">tick</text>
+                  <text x="480" y="138" class="il-yes" text-anchor="end">this one</text>
+                </svg>
+              </div>
+            </li>
+            <li><b>Click Request data</b>, then confirm from the email Spotify sends.</li>
+            <li><b>Wait for the second email</b> with your link, then come back and upload.</li>
+          </ol>
+        </div>
+
+        <div data-panel="mobile" hidden>
+          <p class="callout">The Spotify <b>app</b> can’t request your data. You need a browser — your phone’s browser is fine.</p>
+          <ol class="steps">
+            <li><b>Open your browser</b> — Chrome, Safari, Samsung Internet. Not the Spotify app.</li>
+            <li><b>Go to</b> <code>spotify.com/account/privacy</code> and log in.</li>
+            <li><b>Tap “Desktop site”</b> if the page looks cut off.
+              <div class="illus" aria-hidden="true">
+                <svg viewBox="0 0 520 150" width="100%">
+                  <rect x="150" y="8" width="220" height="134" rx="18" class="il-card"/>
+                  <rect x="164" y="24" width="192" height="20" rx="7" class="il-row"/>
+                  <text x="176" y="38" class="il-sub">spotify.com/account/privacy</text>
+                  <circle cx="344" cy="28" r="2" class="il-dot"/><circle cx="344" cy="34" r="2" class="il-dot"/><circle cx="344" cy="40" r="2" class="il-dot"/>
+                  <rect x="252" y="52" width="104" height="26" rx="7" class="il-row il-row-on"/>
+                  <text x="264" y="69" class="il-lbl-on">Desktop site</text>
+                  <path d="M436 64 C 400 64, 390 64, 368 64" class="il-arrow"/>
+                  <path d="M374 58 l-8 6 l8 6" class="il-arrow-head"/>
+                  <text x="444" y="68" class="il-yes">tap this</text>
+                </svg>
+              </div>
+            </li>
+            <li><b>Scroll to “Download your data”</b> and tick <b>Extended streaming history</b> — not “Account data”.</li>
+            <li><b>Request it</b>, confirm by email, then upload the zip. No need to unzip.</li>
+          </ol>
+        </div>
+      </div>
+      <p style="margin-top:10px"><a href="#/upload" class="btn btn-ghost">I have my file →</a></p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: upload ═══════════ -->
+<div class="page" data-page="/upload">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="reveal" style="--d:60ms">Drop it in.</h2>
+      <p class="reveal" style="--d:100ms">
+        The zip exactly as Spotify sent it. It is read here, on your device — open your
+        browser’s Network tab and watch it stay empty.
+      </p>
+
+      <div id="drop" class="drop reveal" style="--d:140ms" tabindex="0" role="button" aria-label="Choose your Spotify export zip file">
+        <svg class="drop-ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 5v13"/>
+        </svg>
+        <p class="drop-main">Drop your .zip here</p>
+        <p class="drop-sub">or click to choose · loose .json files work too</p>
+        <p class="drop-priv">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+          Read on your device. Never uploaded.
+        </p>
+        <input type="file" id="file" multiple accept=".zip,.json" hidden>
+      </div>
+
+      <div id="progress" class="panel" hidden aria-live="polite">
+        <h2>Reading your file</h2>
+        <p class="prog-n" id="p-records">0</p>
+        <p class="muted" id="p-detail">starting…</p>
+        <div class="bar"><div class="bar-fill" id="p-bar"></div></div>
+      </div>
+
+      <div id="error" class="panel err" hidden role="alert">
+        <h2 id="e-title"></h2><p id="e-body"></p><p id="e-fix" class="e-fix"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: stats ═══════════ -->
+<div class="page" data-page="/stats">
+  <section class="band" style="padding-top:34px">
+    <div class="wrap">
+      <h2 id="r-title">—</h2>
+      <p class="muted small" id="r-note" role="status" aria-live="polite"></p>
+
+      <nav class="appnav" role="tablist" aria-label="Sections">
+        <button role="tab" aria-selected="true"  data-view="overview">Overview</button>
+        <button role="tab" aria-selected="false" data-view="songs">Songs</button>
+        <button role="tab" aria-selected="false" data-view="artists">Artists</button>
+        <button role="tab" aria-selected="false" data-view="albums">Albums</button>
+        <button role="tab" aria-selected="false" data-view="clock">Clock</button>
+        <button role="tab" aria-selected="false" data-view="search">Search</button>
+        <button role="tab" aria-selected="false" data-view="compare">Compare</button>
+      </nav>
+
+      <div class="panel controls" id="controls">
+        <div class="ctl-group">
+          <div class="ctl-head"><h3>Pick a period</h3>
+            <span class="hint">Every number below recomputes instantly.</span></div>
+          <div class="ctl"><span class="ctl-lab">When</span><div id="ranges" class="pills scroll"></div></div>
+          <div class="ctl"><span class="ctl-lab">Or exact</span>
+            <input type="date" id="from" aria-label="From date"><span class="muted small">to</span>
+            <input type="date" id="to" aria-label="To date"><button class="pill" id="apply">Show range</button></div>
+        </div>
+        <div class="ctl-group compact">
+          <div class="ctl-head"><h3>Narrow it down</h3>
+            <span class="hint">Optional. Filters stack.</span></div>
+          <div class="ctl"><span class="ctl-lab">Device</span><div id="plats" class="pills"></div></div>
+          <div class="ctl"><span class="ctl-lab">How</span><div id="hows" class="pills"></div></div>
+          <div class="ctl"><span class="ctl-lab">Include</span><div id="kinds" class="pills"></div></div>
+        </div>
+        <div class="ctl-group">
+          <div class="ctl">
+            <button class="pill" id="reset">Reset all</button>
+            <label class="switch"><input type="checkbox" id="art" checked> Album art</label>
+            <span class="spacer"></span>
+            <span class="muted small num" id="q-time"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-overview" class="view">
+        <div class="figs" id="figs"></div>
+        <div class="fig-detail panel" id="fig-detail" hidden style="margin-top:0;border-radius:0 0 var(--r) var(--r)"></div>
+        <div class="cols2" style="margin-top:18px">
+          <div class="panel"><h2>When you listen</h2><div id="chart-hours" class="chart"></div></div>
+          <div class="panel"><h2>Which days</h2><div id="chart-wdays" class="chart"></div></div>
+        </div>
+        <div class="cols2">
+          <div class="panel"><h2>What you listen on</h2><div id="chart-plats" class="chart"></div></div>
+          <div class="panel"><h2>Where your time goes</h2><div id="donut-artists"></div></div>
+        </div>
+        <div class="panel"><h2>Month by month</h2><div id="chart-months" class="chart"></div></div>
+        <details class="panel"><summary>What we found in your file</summary><div id="quality"></div></details>
+      </div>
+
+      <div id="view-board" class="view" hidden>
+        <div class="panel">
+          <div class="board-head">
+            <h2 id="board-title">Songs</h2>
+            <label class="switch">Sort by
+              <select id="sort">
+                <option value="time">Time listened</option>
+                <option value="plays">Times played</option>
+                <option value="steady">Most consistent</option>
+                <option value="weeks">Weeks in rotation</option>
+                <option value="skips">Times skipped</option>
+                <option value="skipRate">Skip rate</option>
+                <option value="first">First discovered</option>
+                <option value="last">Most recent</option>
+                <option value="alpha">A – Z</option>
+              </select>
+            </label>
+          </div>
+          <ol id="board" class="rank art"></ol>
+          <div class="pager" id="pager"></div>
+          <p class="muted small" id="board-note"></p>
+        </div>
+        <div class="panel" id="drill" hidden>
+          <div class="board-head"><h2 id="drill-title"></h2><button class="pill" id="drill-close">Close</button></div>
+          <div id="drill-donut"></div>
+          <ol id="drill-list" class="rank"></ol>
+        </div>
+      </div>
+
+      <div id="view-clock" class="view" hidden>
+        <div class="cols2">
+          <div class="panel"><h2>Your listening clock</h2><div id="clock-time"></div>
+            <p class="muted small" id="clock-note" style="text-align:center"></p></div>
+          <div class="panel"><h2>Day by day</h2><div id="chart-wdays2" class="chart"></div></div>
+        </div>
+      </div>
+
+      <div id="view-search" class="view" hidden>
+        <div class="panel">
+          <div class="ctl">
+            <div class="search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+              <input type="search" id="q" placeholder="Search any song, artist or album…" autocomplete="off">
+            </div>
+            <span class="muted small" id="q-count"></span>
+          </div>
+          <ol id="search-list" class="rank art"></ol>
+          <div class="pager" id="search-pager"></div>
+        </div>
+      </div>
+
+      <div id="view-compare" class="view" hidden>
+        <div class="panel" id="cmp-empty">
+          <h2>Compare with someone else</h2>
+          <p class="muted small" style="max-width:56ch">
+            Drop their export below. Both files are read in this tab — nothing is uploaded,
+            no account is needed, and neither of you sends anything anywhere.
+          </p>
+          <p class="muted small" style="max-width:56ch">
+            Spotify’s export contains no name or picture, so type whatever labels you like.
+          </p>
+          <div class="cmp-drop" id="cmp-drop" tabindex="0" role="button" aria-label="Choose a second export to compare">
+            <p class="drop-main" style="font-size:18px">Drop their .zip here</p>
+            <p class="drop-sub">or click to choose</p>
+            <input type="file" id="cmp-file" multiple accept=".zip,.json" hidden>
+          </div>
+          <div id="cmp-progress" class="muted small" style="margin-top:12px"></div>
+        </div>
+        <div id="cmp-out" hidden></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: privacy ═══════════ -->
+<div class="page" data-page="/privacy">
+  <section class="band legal">
+    <div class="wrap">
+      <h2>Privacy</h2>
+      <p class="updated">Alpha 1.0 · last updated 30 August 2026</p>
+
+      <h3>The short version</h3>
+      <p>Your Spotify file never leaves your device. There is no account, no login and no
+        server holding your listening history. You can verify this yourself: open your
+        browser’s developer tools, go to the Network tab, and upload your file. Nothing
+        containing your data is sent anywhere.</p>
+
+      <h3>What happens to your file</h3>
+      <p>When you upload, the file is read in your browser’s memory and turned into
+        statistics. It is not copied, stored or transmitted. Closing or refreshing the tab
+        discards everything — which is why you have to upload again each visit.</p>
+
+      <h3>What does leave your browser</h3>
+      <p>Two things, and neither one carries anything about you:</p>
+      <ul>
+        <li><b>Album artwork.</b> For albums currently visible on your screen, we ask
+          Deezer&#39;s public catalogue for a cover image, sending only an artist name and an
+          album name. We never send play counts, timestamps, totals, rankings, or anything
+          describing how much you listened. Switch artwork off and this stops entirely.</li>
+        <li><b>Our own contact status.</b> The small contact chips ask Lanyard&#39;s public
+          endpoint whether a member of our team is online on Discord. That request fetches
+          <em>our</em> status and sends nothing whatsoever about you — no identifier, no
+          listening data, not even a note that you visited. Blocking it changes nothing
+          except that the chip shows GitHub instead.</li>
+      </ul>
+      <p>Cover results are cached in your browser’s local storage so the same album is not
+        looked up twice. That cache stays on your device.</p>
+
+      <h3>What we store on your device</h3>
+      <ul>
+        <li>Your light or dark theme preference.</li>
+        <li>The album-art cache described above.</li>
+        <li>Whether you have dismissed the ad-blocker notice this session.</li>
+      </ul>
+      <p>Nothing here identifies you, and none of it is sent to us.</p>
+
+      <h3>Analytics and ads</h3>
+      <p>This alpha runs no advertising and no analytics. If advertising is added later it
+        will be disclosed here before it ships, and it could never be based on your
+        listening — we do not receive it.</p>
+
+      <h3>Children</h3>
+      <p>Longplay is not directed at children under 13 and we knowingly collect nothing
+        from anyone, of any age.</p>
+
+      <h3>Contact</h3>
+      <p>Questions go to <a href="https://emberfig.com" rel="noopener">emberfig.com</a>.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ PAGE: terms ═══════════ -->
+<div class="page" data-page="/terms">
+  <section class="band legal">
+    <div class="wrap">
+      <h2>Terms of use</h2>
+      <p class="updated">Alpha 1.0 · last updated 30 August 2026</p>
+
+      <h3>What this is</h3>
+      <p>Longplay is a free tool made by Emberfig that reads a Spotify data export you
+        already own and shows you statistics from it. Using the site means accepting these
+        terms.</p>
+
+      <h3>Alpha software</h3>
+      <p>This is an alpha release. It may be wrong, incomplete, or unavailable without
+        notice. Do not rely on it for anything that matters. Numbers are calculated from
+        the file you provide and reflect what Spotify put in it — including any gaps or
+        errors of their own.</p>
+
+      <h3>Your file is yours</h3>
+      <p>You keep every right to your data. We claim nothing, receive nothing, and store
+        nothing. Only upload a file you are entitled to — your own export.</p>
+
+      <h3>Not affiliated with Spotify</h3>
+      <p>Longplay is independent. It is not affiliated with, endorsed, sponsored by, or
+        connected to Spotify AB. “Spotify” is their trademark, used here only to describe
+        what the file is and where it came from. We use no Spotify API and ask for no
+        access to your account.</p>
+
+      <h3>Album artwork</h3>
+      <p>Cover images are served by Deezer’s public catalogue and remain the property of
+        their respective owners. They are displayed from Deezer’s servers, never copied or
+        re-hosted.</p>
+
+      <h3>Acceptable use</h3>
+      <ul>
+        <li>Do not attempt to disrupt the site or the people using it.</li>
+        <li>Do not present output from this tool as official Spotify data.</li>
+        <li>Do not upload files belonging to someone who has not agreed to it.</li>
+      </ul>
+
+      <h3>No warranty, and limits on liability</h3>
+      <p>The site is provided “as is”, without warranties of any kind, express or implied,
+        including fitness for a particular purpose and accuracy. To the fullest extent
+        permitted by law, Emberfig is not liable for any loss or damage arising from your
+        use of it. Some jurisdictions do not allow these exclusions, in which case they
+        apply to you only as far as the law allows.</p>
+
+      <h3>Changes</h3>
+      <p>These terms may change as the product leaves alpha. The date above shows the last
+        revision, and continued use after a change means you accept it.</p>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<div class="presence right" id="presence-moses"></div>
+<div class="presence left" id="presence-tim"></div>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p><b>Longplay</b> is made by <a href="https://emberfig.com" rel="noopener">Emberfig</a>.
+        Free, never a subscription. Not affiliated with, endorsed by, or connected to Spotify AB.</p>
+      <div class="presence-inline">
+        <div id="inline-moses"></div>
+        <div id="inline-tim"></div>
+      </div>
+      <div class="foot-links">
+        <a href="#/privacy">Privacy</a>
+        <a href="#/terms">Terms</a>
+        <a href="#/why">About</a>
+        <a href="https://emberfig.com" rel="noopener">Emberfig</a>
+      </div>
+    </div>
+    <p>Album art comes from Deezer’s public catalogue — only an artist and album name are sent,
+      only for what is on your screen. Switch it off and nothing leaves your browser at all.</p>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

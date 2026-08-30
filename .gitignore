@@ -1,0 +1,29 @@
+# ── personal data — never commit, never send ───────────────────────────
+# Real Spotify exports. These are somebody's complete listening history:
+# every track, every timestamp, every device, going back to day one.
+# They are test fixtures for whoever owns them and nobody else.
+spotify data/
+*.zip
+my_spotify_data/
+**/Streaming_History_*.json
+**/Userdata.json
+
+# ── build + dependencies ───────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+
+# ── local tooling, not part of the product ─────────────────────────────
+# Agent skills used while building. .claude/launch.json is kept — it is the
+# run configuration and is genuinely useful to the next person.
+.agents/
+.claude/skills/
+skills-lock.json
+
+# ── editor / OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
