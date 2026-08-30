@@ -77,13 +77,12 @@ jobs:
           VITE_BASE: /${{ github.event.repository.name }}/
         run: npm run build
 
+      # Do NOT add `enablement: true` here. Creating a Pages site needs
+      # "Administration: write", which the GITHUB_TOKEN can never hold —
+      # `administration` is not even a valid key under `permissions:`. It fails
+      # with "Resource not accessible by integration". Pages has to be turned on
+      # once by hand: Settings -> Pages -> Source -> GitHub Actions.
       - uses: actions/configure-pages@v5
-        with:
-          # Turns Pages on via the API if it has never been enabled, instead of
-          # failing with "Get Pages site failed / Not Found" and making someone
-          # go flip it by hand in Settings. Needs the pages: write permission
-          # declared at the top of this file.
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
